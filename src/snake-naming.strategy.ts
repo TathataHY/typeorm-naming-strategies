@@ -1,6 +1,7 @@
 // Credits to @recurrence
 // https://gist.github.com/recurrence/b6a4cb04a8ddf42eda4e4be520921bd2
 
+import pluralize from 'pluralize';
 import { DefaultNamingStrategy, NamingStrategyInterface } from 'typeorm';
 import { snakeCase } from 'typeorm/util/StringUtils';
 
@@ -8,7 +9,7 @@ export class SnakeNamingStrategy
   extends DefaultNamingStrategy
   implements NamingStrategyInterface {
   tableName(className: string, customName: string): string {
-    return customName ? customName : snakeCase(className);
+    return pluralize(customName ? customName : snakeCase(className));
   }
 
   columnName(
@@ -27,7 +28,9 @@ export class SnakeNamingStrategy
   }
 
   joinColumnName(relationName: string, referencedColumnName: string): string {
-    return snakeCase(relationName + '_' + referencedColumnName);
+    return snakeCase(
+      pluralize.singular(relationName) + '_' + referencedColumnName,
+    );
   }
 
   joinTableName(
@@ -37,11 +40,7 @@ export class SnakeNamingStrategy
     secondPropertyName: string,
   ): string {
     return snakeCase(
-      firstTableName +
-        '_' +
-        firstPropertyName.replace(/\./gi, '_') +
-        '_' +
-        secondTableName,
+      firstTableName + '_' + secondTableName.replace(/\./gi, '_'),
     );
   }
 
@@ -51,7 +50,9 @@ export class SnakeNamingStrategy
     columnName?: string,
   ): string {
     return snakeCase(
-      tableName + '_' + (columnName ? columnName : propertyName),
+      pluralize.singular(tableName) +
+        '_' +
+        (columnName ? columnName : propertyName),
     );
   }
 
